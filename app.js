@@ -7,6 +7,40 @@
 
 "use strict";
 
+const { Client } = require('pg')
+  const connectionData = {
+      user: 'rwndjpvi',
+      host: 'trumpet.db.elephantsql.com',
+      database: 'rwndjpvi',
+      password: 'xe7nhSHrlEA62i6n5EzzNeI5uUKUJ5Wa',
+      port: 5432,  
+  }
+  const client = new Client(connectionData)
+  client.connect()
+
+async function menu(){
+  client.query("SELECT tablename FROM pg_tables where schemaname = 'public'")
+      .then(response => {
+          let msg = ""
+          let value = 0
+          while (value < response.rowCount-1) {
+            value += 1;
+            msg = msg+" "+value+" "+capitalizeFirstLetter(response.rows[value].tablename.split('_').join(' '))+"\n"
+          }
+          client.end()
+          return msg
+      })
+      .catch(err => {
+          client.end()
+      })
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
+menu()
 // Access token for your app
 // (copy token from DevX getting started page
 // and save it as environment variable into the .env file)
@@ -45,22 +79,24 @@ app.post("/webhook", (req, res) => {
         req.body.entry[0].changes[0].value.metadata.phone_number_id;
       let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
       let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
-      axios({
-        method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-        url:
-          "https://graph.facebook.com/v12.0/" +
-          phone_number_id +
-          "/messages?access_token=" +
-          token,
-        data: {
-          messaging_product: "whatsapp",
-          to: from,
-          text: { body: "Ack: " + msg_body },
-        },
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((response) => console.log(response))
-     	.catch((error) => console.log(error));
+      if(msg_body = "HOLA"){
+        axios({
+          method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+          url:
+            "https://graph.facebook.com/v12.0/" +
+            phone_number_id +
+            "/messages?access_token=" +
+            token,
+          data: {
+            messaging_product: "whatsapp",
+            to: from,
+            text: { body: menu() },
+          },
+          headers: { "Content-Type": "application/json" },
+        })
+        .then((response) => console.log(response))
+        .catch((error) => console.log(error));
+      }
     }
     res.sendStatus(200);
   } else {
