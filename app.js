@@ -22,7 +22,7 @@ const request = require("request"),
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 8080, () => console.log("webhook is listening"));
 app.get("/", (req, res) => {
-  res.sendFile('./index.html');
+  res.sendFile('/app/index.html');
 });
 // Accepts POST requests at /webhook endpoint
 app.post("/webhook", (req, res) => {
