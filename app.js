@@ -58,7 +58,9 @@ app.post("/webhook", (req, res) => {
           text: { body: "Ack: " + msg_body },
         },
         headers: { "Content-Type": "application/json" },
-      });
+      })
+      .then((response) => console.log(response))
+     	.catch((error) => console.log(error));
     }
     res.sendStatus(200);
   } else {
