@@ -19,20 +19,20 @@ const { Client } = require('pg')
   client.connect()
 
 async function menu(){
-  client.query("SELECT tablename FROM pg_tables where schemaname = 'public'")
+  let msg = ""
+  await client.query("SELECT tablename FROM pg_tables where schemaname = 'public'")
       .then(response => {
-          let msg = ""
           let value = 0
           while (value < response.rowCount-1) {
             value += 1;
-            msg = msg+" "+value+" "+capitalizeFirstLetter(response.rows[value].tablename.split('_').join(' '))+"\n"
+          	msg = msg+" "+"*"+value+". "+capitalizeFirstLetter(response.rows[value].tablename.split('_').join(' '))+"*"+"\n\n"
           }
-          client.end()
-          return msg
       })
       .catch(err => {
           client.end()
       })
+  await Promise.all(msg)
+  return await msg
 }
 
 function capitalizeFirstLetter(string) {
@@ -40,7 +40,6 @@ function capitalizeFirstLetter(string) {
 }
 
 
-menu()
 // Access token for your app
 // (copy token from DevX getting started page
 // and save it as environment variable into the .env file)
@@ -79,7 +78,26 @@ app.post("/webhook", (req, res) => {
         req.body.entry[0].changes[0].value.metadata.phone_number_id;
       let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
       let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
-      if(msg_body = "HOLA"){
+      
+      if(msg_body.toUpperCase() == "HOLA") {(async () => {
+          axios({
+          method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+          url:
+            "https://graph.facebook.com/v12.0/" +
+            phone_number_id +
+            "/messages?access_token=" +
+            token,
+          data: {
+            messaging_product: "whatsapp",
+            to: from,
+            text: { body: '*Respuesta automática*\n'+await menu() },
+          },
+          headers: { "Content-Type": "application/json" },
+        })
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error));
+        })()}
+      else{
         axios({
           method: "POST", // Required, HTTP method, a string, e.g. POST, GET
           url:
@@ -90,13 +108,14 @@ app.post("/webhook", (req, res) => {
           data: {
             messaging_product: "whatsapp",
             to: from,
-            text: { body: menu() },
+            text: { body: '*Respuesta automática*\n'+'Por favor si quiere saber los servicios disponibles en Trinitat Nova envíe la palabra "HOLA"' },
           },
           headers: { "Content-Type": "application/json" },
         })
-        .then((response) => console.log(response))
-        .catch((error) => console.log(error));
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error));
       }
+    
     }
     res.sendStatus(200);
   } else {
