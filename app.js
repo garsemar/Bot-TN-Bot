@@ -57,14 +57,9 @@ app.listen(process.env.PORT || 8080, () => console.log("webhook is listening"))
 app.get("/", (req, res) => {
   res.sendFile('/app/index.html');
 });
-app.get("/style", (req, res) => {
-  res.sendFile('/app/style.css');
-});
-app.get("/fondo", (req, res) => {
-  res.sendFile('/app/src/fondo.jpg')
-});
-app.get("/logo", (req, res) => {
-  res.sendFile('/app/src/bot.png');
+app.get("/file", (req, res) => {
+  // /something?color1=red
+  res.sendFile('/app/src/'+req.query.name);
 });
 // Accepts POST requests at /webhook endpoint
 app.post("/webhook", (req, res) => {

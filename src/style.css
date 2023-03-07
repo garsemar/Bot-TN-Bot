@@ -3,7 +3,7 @@ html, body{
     margin:0;
     display: flex;
     flex-direction: column;
-    background-image: url("/fondo");
+    background-image: url("/file?name=fondo.jpg");
     opacity: 100%;
 }
 
