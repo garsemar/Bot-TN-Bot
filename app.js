@@ -13,7 +13,7 @@ const { Client } = require('pg')
       host: 'trumpet.db.elephantsql.com',
       database: 'rwndjpvi',
       password: 'xe7nhSHrlEA62i6n5EzzNeI5uUKUJ5Wa',
-      port: 5432,  
+      port: 5432,
   }
   const client = new Client(connectionData)
   client.connect()
@@ -53,9 +53,18 @@ const request = require("request"),
   app = express().use(body_parser.json()); // creates express http server
 
 // Sets server port and logs message on success
-app.listen(process.env.PORT || 8080, () => console.log("webhook is listening"));
+app.listen(process.env.PORT || 8080, () => console.log("webhook is listening"))
 app.get("/", (req, res) => {
   res.sendFile('/app/index.html');
+});
+app.get("/style", (req, res) => {
+  res.sendFile('/app/style.css');
+});
+app.get("/fondo", (req, res) => {
+  res.sendFile('/app/src/fondo.jpg')
+});
+app.get("/logo", (req, res) => {
+  res.sendFile('/app/src/bot.png');
 });
 // Accepts POST requests at /webhook endpoint
 app.post("/webhook", (req, res) => {
@@ -79,7 +88,7 @@ app.post("/webhook", (req, res) => {
       let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
       let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
       
-      if(msg_body.toUpperCase() == "HOLA") {(async () => {
+      if(msg_body.toUpperCase() == "MENU") {(async () => {
           axios({
           method: "POST", // Required, HTTP method, a string, e.g. POST, GET
           url:
@@ -108,7 +117,7 @@ app.post("/webhook", (req, res) => {
           data: {
             messaging_product: "whatsapp",
             to: from,
-            text: { body: '*Respuesta automática*\n'+'Por favor si quiere saber los servicios disponibles en Trinitat Nova envíe la palabra "HOLA"' },
+            text: { body: '*Respuesta automática*\n'+'Por favor si quiere saber los servicios disponibles en Trinitat Nova envíe la palabra "MENU"' },
           },
           headers: { "Content-Type": "application/json" },
         })
