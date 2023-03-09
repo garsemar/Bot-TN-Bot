@@ -3,7 +3,7 @@ html, body{
     margin:0;
     display: flex;
     flex-direction: column;
-    background-image: url("/file?name=fondo.jpg");
+    background-image: url("src/fondo.jpg");
     opacity: 100%;
 }
 
@@ -89,7 +89,7 @@ html, body{
 /* ················· FOOTER ················· */
 
 .footer-basic{
-    position: fixed;
+    position:absolute;
     bottom: 0;
     width: 100%;
     background-color: rgb(27, 27, 27);
@@ -124,3 +124,17 @@ html, body{
   .footer-basic ul a:hover {
     opacity:1;
   }
+table, td{
+    border: 1px solid;
+}
+
+table {
+    width:70%; margin-left:15%; margin-right:15%;
+}
+*{
+    overflow: hidden;
+}
+#bodyAdmin{
+    overflow-y: scroll;
+    max-height:76%
+}

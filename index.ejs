@@ -1,49 +1,56 @@
 <!DOCTYPE html>
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/file?name=style.css">
-  	<link rel="icon" href="/file?name=bot.png" type="image/png" />
+    <link rel="icon" href="/file?name=bot.png" type="image/png" />
     <link href="https://fonts.googleapis.com/css2?family=Lobster+Two&display=swap" rel="stylesheet">
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,0,0"/>
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,0,0" />
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <title>BOT TN</title>
 </head>
+
 <body>
-<div id="all">
-    <div id="cabecera">
-        <div id="title_cabecera">
-            WEB NAME
+    <div id="all">
+        <div id="cabecera">
+            <div id="title_cabecera">
+                WEB NAME
+            </div>
+            <!-- <input id="buscador_cabecera" type="text" placeholder="Buscar..."> -->
+            <a href="/login" id="login_cabecera">LOGIN</a>
         </div>
-        <!-- <input id="buscador_cabecera" type="text" placeholder="Buscar..."> --> 
-        <div id="login_cabecera">
-            LOGIN
+        <div id="body">
+            <div id="enlaces">
+                <table>
+                    <% Object.keys(tables).forEach(key => { %>
+                        <tr>
+                            <td><%=tables[key]%></td>
+                            <td><a href="#">Edit</a></td>
+                        </tr>
+                    <% }); %>
+                </table>
+            </div>
+            <div id="qr">
+                <img id="qr_img" src="/file?name=QR.png">
+            </div>
+        </div>
+        <div class="footer-basic">
+            <footer>
+                <table>
+                    <ul>
+                        <li><a href="#">Condiciones de uso</a></li>
+                        <li><a href="#">Políticas de privacidad</a></li>
+                        <li><a href="#">Políticas de cookies</a></li>
+                        <li><a href="#">Accesibildad</a></li>
+                        </tr>
+                </table>
+            </footer>
         </div>
     </div>
-    <div id="body">
-        <div id="enlaces">
-						<% tables.forEach(function(entry) { %>
-              <p><%=entry%></p>
-						<% }); %>
-        </div>
-        <div id="qr">
-            <img id="qr_img" src="/file?name=QR.png">
-        </div>
-    </div>
-    <div class="footer-basic">
-        <footer>
-            <table>
-                <ul>
-                    <li><a href="#">Condiciones de uso</a></li>
-                    <li><a href="#">Políticas de privacidad</a></li>
-                    <li><a href="#">Políticas de cookies</a></li>
-                    <li><a href="#">Accesibildad</a></li>
-                </tr>
-            </table>
-        </footer>
-    </div>
-</div>
 </body>
+
 </html>

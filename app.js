@@ -69,8 +69,14 @@ const request = require("request"),
 app.listen(process.env.PORT || 8080, () => console.log("webhook is listening"))
 app.get("/", (req, res) => {
   // res.sendFile('/app/index.html');
-  res.render("/app/index.ejs", {
-    tables: [1,2,3,4,5,6]
+  res.render("index.ejs", {
+    tables: tables
+  })
+});
+app.get("/admin", (req, res) => {
+  // res.sendFile('/app/index.html');
+  res.render("admin.ejs", {
+    tables: tables
   })
 });
 app.get("/file", (req, res) => {
