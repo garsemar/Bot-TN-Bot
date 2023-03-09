@@ -4,9 +4,9 @@
  * Remix this as the starting point for following the WhatsApp Echo Bot tutorial
  *
  */
-
+let msg = ""
 "use strict";
-
+let tables = {};
 const { Client } = require('pg')
   const connectionData = {
       user: 'rwndjpvi',
@@ -19,13 +19,13 @@ const { Client } = require('pg')
   client.connect()
 
 async function menu(){
-  let msg = ""
   await client.query("SELECT tablename FROM pg_tables where schemaname = 'public'")
       .then(response => {
           let value = 0
           while (value < response.rowCount-1) {
             value += 1;
-          	msg = msg+" "+"*"+value+". "+capitalizeFirstLetter(response.rows[value].tablename.split('_').join(' '))+"*"+"\n\n"
+            tables[value] = response.rows[value].tablename
+          	msg = msg+" "+"*"+value+": "+capitalizeFirstLetter(response.rows[value].tablename.split('_').join(' '))+"*"+"\n\n"
           }
       })
       .catch(err => {
@@ -35,41 +35,51 @@ async function menu(){
   return await msg
 }
 
+async function listNames(name, numList){
+  let msg2 = ""
+  await client.query("SELECT id, nom FROM "+name)
+      .then(response => {
+          for(const i of response.rows) {
+          	msg2 = msg2+" "+numList+"."+i.id+": "+i.nom+"\n\n"
+          }
+      })
+      .catch(err => {
+          client.end()
+      })
+  await Promise.all(msg2)
+  return await msg2
+}
+
+(async () => {
+	msg = await menu()
+})()
+
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-
-// Access token for your app
-// (copy token from DevX getting started page
-// and save it as environment variable into the .env file)
 const token = process.env.WHATSAPP_TOKEN;
 
-// Imports dependencies and set up http server
 const request = require("request"),
   express = require("express"),
   body_parser = require("body-parser"),
   axios = require("axios").default,
-  app = express().use(body_parser.json()); // creates express http server
+  app = express().use(body_parser.json());
 
-// Sets server port and logs message on success
 app.listen(process.env.PORT || 8080, () => console.log("webhook is listening"))
 app.get("/", (req, res) => {
-  res.sendFile('/app/index.html');
+  // res.sendFile('/app/index.html');
+  res.render("/app/index.ejs", {
+    tables: [1,2,3,4,5,6]
+  })
 });
 app.get("/file", (req, res) => {
   // /something?color1=red
   res.sendFile('/app/src/'+req.query.name);
 });
-// Accepts POST requests at /webhook endpoint
 app.post("/webhook", (req, res) => {
-  // Parse the request body from the POST
   let body = req.body;
 
-  // Check the Incoming webhook message
-  console.log(JSON.stringify(req.body, null, 2));
-
-  // info on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
   if (req.body.object) {
     if (
       req.body.entry &&
@@ -83,9 +93,9 @@ app.post("/webhook", (req, res) => {
       let from = req.body.entry[0].changes[0].value.messages[0].from; // extract the phone number from the webhook payload
       let msg_body = req.body.entry[0].changes[0].value.messages[0].text.body; // extract the message text from the webhook payload
       
-      if(msg_body.toUpperCase() == "MENU") {(async () => {
+      if(msg_body.toUpperCase() == "MENU") {
           axios({
-          method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+          method: "POST",
           url:
             "https://graph.facebook.com/v12.0/" +
             phone_number_id +
@@ -94,16 +104,34 @@ app.post("/webhook", (req, res) => {
           data: {
             messaging_product: "whatsapp",
             to: from,
-            text: { body: '*Respuesta automática*\n'+await menu() },
+            text: { body: '*Respuesta automática*\n'+msg },
           },
           headers: { "Content-Type": "application/json" },
         })
-            .then((response) => console.log(response))
+            .then((response) => console.log("response"))
+            .catch((error) => console.log("error"));
+      }
+      else if(1 <= parseInt(msg_body) && parseInt(msg_body) <= Object.keys(tables).length){(async () => {
+          axios({
+          method: "POST",
+          url:
+            "https://graph.facebook.com/v12.0/" +
+            phone_number_id +
+            "/messages?access_token=" +
+            token,
+          data: {
+            messaging_product: "whatsapp",
+            to: from,
+            text: { body: '*Respuesta automática*\n'+await listNames(tables[parseInt(msg_body)], msg_body) },
+          },
+          headers: { "Content-Type": "application/json" },
+        })
+            .then((response) => console.log("response"))
             .catch((error) => console.log(error));
         })()}
       else{
         axios({
-          method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+          method: "POST",
           url:
             "https://graph.facebook.com/v12.0/" +
             phone_number_id +
@@ -116,41 +144,29 @@ app.post("/webhook", (req, res) => {
           },
           headers: { "Content-Type": "application/json" },
         })
-            .then((response) => console.log(response))
-            .catch((error) => console.log(error));
+            .then((response) => console.log("response"))
+            .catch((error) => console.log("error"));
       }
     
     }
     res.sendStatus(200);
   } else {
-    // Return a '404 Not Found' if event is not from a WhatsApp API
     res.sendStatus(404);
   }
 });
 
-// Accepts GET requests at the /webhook endpoint. You need this URL to setup webhook initially.
-// info on verification request payload: https://developers.facebook.com/docs/graph-api/webhooks/getting-started#verification-requests
 app.get("/webhook", (req, res) => {
-  /**
-   * UPDATE YOUR VERIFY TOKEN
-   *This will be the Verify Token value when you set up webhook
-   **/
   const verify_token = process.env.VERIFY_TOKEN;
 
-  // Parse params from the webhook verification request
   let mode = req.query["hub.mode"];
   let token = req.query["hub.verify_token"];
   let challenge = req.query["hub.challenge"];
 
-  // Check if a token and mode were semeta dev nt
   if (mode && token) {
-    // Check the mode and token sent are correct
     if (mode === "subscribe" && token === verify_token) {
-      // Respond with 200 OK and challenge token from the request
       console.log("WEBHOOK_VERIFIED");
       res.status(200).send(challenge);
     } else {
-      // Responds with '403 Forbidden' if verify tokens do not match
       res.sendStatus(403);
     }
   }
