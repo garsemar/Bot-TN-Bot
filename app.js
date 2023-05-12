@@ -30,6 +30,7 @@ async function menu() {
     .query("SELECT id, nom FROM categories order by id asc")
     .then((response) => {
       let value = 0;
+    	msg = ""
       while (value < response.rowCount) {
         value += 1;
         tables[response.rows[value - 1].id] = response.rows[value - 1].nom;
@@ -232,7 +233,8 @@ app.post("/api/tableName/:nom", async (req, res) => {
   const nom = req.params.nom;
 
   try {
-    await client.query("INSERT INTO categories (nom) VALUES ($1)", [nom]);
+    await client.query("INSERT INTO categories (id, nom) VALUES ((select max(id)+1 from categories), $1)", [nom]);
+    await client.query("INSERT INTO items (idCat) VALUES ((select id from categories order by id desc limit 1))");
     const message = `La categoria ${nom} s'ha creat correctament`;
     msg = await menu();
     await res.status(201).json({ message });
@@ -279,7 +281,7 @@ app.post("/api/item/:id", async (req, res) => {
   const id = req.params.id;
 
   await client
-    .query("insert into items (idCat) values ($1)", [id])
+    .query("insert into items (id, idCat) values ((select max(id)+1 from items), $1)", [id])
     .then((response) => {});
   msg = await menu();
   await res.status(201).json({
