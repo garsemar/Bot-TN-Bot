@@ -18,37 +18,76 @@
     <div id="all">
         <div id="cabecera">
             <div id="title_cabecera">
-                WEB NAME
+              <a href="/index2" class="homeLink">
+                Bot Trinitat Nova
+              </a>
             </div>
             <!-- <input id="buscador_cabecera" type="text" placeholder="Buscar..."> -->
-            <a href="/login" id="login_cabecera">LOGIN</a>
+            <a href="/login" id="login_cabecera">Log In</a>
         </div>
-        <div id="body">
+        <div id="cuerpo">
             <div id="enlaces">
-                <table>
+                <ul>
                     <% Object.keys(tables).forEach(key => { %>
-                        <tr>
-                            <td><%=tables[key]%></td>
-                            <td><a href="#">Edit</a></td>
-                        </tr>
+                        <li><a href="/info"><%=tables[key]%></a></li>
                     <% }); %>
-                </table>
+                </ul>
+            </div>
+            <div id="eventos">
+                <a href="#">
+                    <div class="evento">
+                        Evento 1
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 2
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 3
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 4
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 5
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 6
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 7
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 8
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="evento">
+                        Evento 9
+                    </div>
+                </a>
             </div>
             <div id="qr">
                 <img id="qr_img" src="/file?name=QR.png">
+                <a href="https://wa.me/message/E5USRNWNH4VBL1">
+                    <button id="qr_button">
+                        WhatsApp Bot
+                    </button>
+                </a>
             </div>
-        </div>
-        <div class="footer-basic">
-            <footer>
-                <table>
-                    <ul>
-                        <li><a href="#">Condiciones de uso</a></li>
-                        <li><a href="#">Políticas de privacidad</a></li>
-                        <li><a href="#">Políticas de cookies</a></li>
-                        <li><a href="#">Accesibildad</a></li>
-                        </tr>
-                </table>
-            </footer>
         </div>
     </div>
 </body>

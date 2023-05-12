@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- /file?name=style.css-->
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/file?name=style.css">
@@ -18,32 +18,27 @@
     <div id="all">
         <div id="cabecera">
             <div id="title_cabecera">
-                <a href="/" class="homeLink">
+              <a href="/" class="homeLink">
                 Bot Trinitat Nova
               </a>
             </div>
             <!-- <input id="buscador_cabecera" type="text" placeholder="Buscar..."> -->
-            <a href="/" id="login_cabecera">LOG OUT</a>
+            <a href="/login" id="login_cabecera">LOGIN</a>
         </div>
-        <div id="go_events">
-            <a href="events">Eventos y noticias</a>
+        <div id="cuerpo">
+            
         </div>
-        <div>
-            <form action="/createCat" method="post">
-                <input type="text" id="new_category" placeholder="Nombre de la categoria" required>
-                <input type="submit" id="add_category" value="Afegir">
-            </form>
-        <div id="bodyAdmin">
-            <table>
-                <% Object.keys(tables).forEach(key => { %>
-                    <tr>
-                        <td><%=tables[key]%></td>
-                        <td><a href=<%="/editCat?id="+tables[key]%>>Edit</a></td>
-              					<td><a href=<%="/delCat?id="+tables[key]%>>Delete</a></td>
-                    </tr>
-                <% }); %>
-            </table>
-        </div>
+        <div class="footer-basic">
+            <footer>
+                <table>
+                    <ul>
+                        <li><a href="#">Condiciones de uso</a></li>
+                        <li><a href="#">Políticas de privacidad</a></li>
+                        <li><a href="#">Políticas de cookies</a></li>
+                        <li><a href="#">Accesibildad</a></li>
+                        </tr>
+                </table>
+            </footer>
         </div>
     </div>
 </body>

@@ -25,7 +25,6 @@ function isIntList(array) {
 }
 
 async function menu() {
-  tables = {};
   await client
     .query("SELECT id, nom FROM categories order by id asc")
     .then((response) => {
@@ -37,11 +36,9 @@ async function menu() {
           msg +
           " " +
           "*" +
-          response.rows[value - 1].id +
+          response.rows[value].id +
           ": " +
-          capitalizeFirstLetter(
-            response.rows[value - 1].nom.split("_").join(" ")
-          ) +
+          capitalizeFirstLetter(response.rows[value].nom.split("_").join(" ")) +
           "*" +
           "\n\n";
       }
@@ -73,7 +70,6 @@ async function listNames(name, numList) {
 
 async function listInfo(id1, id, msg) {
   let msgInfo = "";
-  console.log(id);
   await client
     .query(
       "SELECT id, idCat, nom, informacion, contacto, horarios, web, direccion FROM (SELECT row_number() over() id, idCat, nom, informacion, contacto, horarios, web, direccion FROM items WHERE idCat = " +
@@ -140,7 +136,7 @@ class Sender {
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => console.log("response"))
-      .catch((error) => console.log(error));
+      .catch((error) => console.log("error"));
   }
 }
 
@@ -218,23 +214,7 @@ app.get("/file", (req, res) => {
 });
 
 app.get("/api/tableName", (req, res) => {
-  console.log(tables);
   res.json(tables);
-});
-
-app.get("/api/tableName/:id", async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const result = await client.query(
-      "SELECT idCat, id, nom, informacion, contacto, horarios, web, direccion FROM items WHERE idcat = $1",
-      [id]
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al obtener los datos" });
-  }
 });
 
 app.put("/api/tableName/:id", async (req, res) => {
@@ -247,9 +227,7 @@ app.put("/api/tableName/:id", async (req, res) => {
   msg = await menu();
   await res.json({
     message:
-      `El nombre de la categoria ` +
-      body.nom +
-      ` se ha actualizado correctamente`,
+      `El nom de la categoria ` + body.nom + ` s'ha actualitzat correctament`,
   });
 });
 
@@ -263,132 +241,10 @@ app.delete("/api/tableName/:id", async (req, res) => {
     .query("delete from categories where id = " + id)
     .then((response) => {});
   msg = await menu();
+  console.log(id);
   await res.json({
     message: `La categoria ` + id + `s'ha eliminat correctament`,
   });
-});
-
-app.post("/api/tableName/:nom", async (req, res) => {
-  const nom = req.params.nom;
-
-  try {
-    await client.query("INSERT INTO categories (nom) VALUES ($1)", [nom]);
-    const message = `La categoria ${nom} s'ha creat correctament`;
-    msg = await menu();
-    await res.status(201).json({ message });
-  } catch (error) {
-    console.error(error);
-    await res.status(500).json({ message: "Error al crear la categoria" });
-  }
-});
-
-app.put("/api/item", async (req, res) => {
-  const id = req.body.id;
-  const nom = req.body.nom;
-  const informacion = req.body.informacion;
-  const contacto = req.body.contacto;
-  const horarios = req.body.horarios;
-  const web = req.body.web;
-  const direccion = req.body.direccion;
-  
-
-  try {
-    await client.query("update items set nom = ($1), informacion = ($2), contacto = ($3), horarios = ($4), web = ($5), direccion = ($6) where id = ($7)", [nom, informacion, contacto, horarios, web, direccion, id]);
-    const message = `La categoria ${nom} s'ha actualitzat correctament`;
-    msg = await menu();
-    await res.status(201).json({ message });
-  } catch (error) {
-    console.error(error);
-    await res.status(500).json({ message: "Error al crear la categoria" });
-  }
-});
-
-app.delete("/api/item/:id", async (req, res) => {
-  const id = req.params.id;
-
-  await client
-    .query("delete from items where id = " + id)
-    .then((response) => {});
-  msg = await menu();
-  await res.status(201).json({
-    message: `La categoria ` + id + `s'ha eliminat correctament`,
-  });
-});
-
-app.post("/api/item/:id", async (req, res) => {
-  const id = req.params.id;
-
-  await client
-    .query("insert into items (idCat) values ($1)", [id])
-    .then((response) => {});
-  msg = await menu();
-  await res.status(201).json({
-    message: `La categoria ` + id + `s'ha afegit correctament`,
-  });
-});
-
-
-app.get("/api/events/:event", async (req, res) => {
-  const event = req.params.event
-
-  await client
-    .query("select id, titulo, informacion, links from eventsnoticias where event = " + event)
-    .then((response) => {
-      res.json(response.rows);
-    })
-    .catch((err) => {
-      client.end();
-    });
-});
-
-app.post("/api/events/:titulo&:informacion&:links&:event", async (req, res) => {
-  const titulo = req.params.titulo;
-  const informacion = req.params.informacion;
-  const links = req.params.links;
-  const event = req.params.event;
-
-  try {
-    await client.query("INSERT INTO eventnoticias (titulo, informacion, links, event) VALUES ($1, $2, $3, $4)", [titulo, informacion, links, event]);
-    const message = `L'event ${titulo} s'ha creat correctament`;
-    msg = await menu();
-    await res.status(201).json({ message });
-  } catch (error) {
-    console.error(error);
-    await res.status(500).json({ message: "Error al crear l'event" });
-  }
-});
-
-app.delete("/api/events/:id", async (req, res) => {
-  const id = req.params.id;
-
-  await client
-    .query("delete from eventsnoticias where id = " + id)
-    .then((response) => {});
-  await client;
-  msg = await menu();
-  await res.json({
-    message: `L'event ` + id + `s'ha eliminat correctament`,
-  });
-});
-
-app.post("/api/events/:tiulo/:informacion/:links/:event", async (req, res) => {
-  const titulo = req.params.titulo;
-  const informacion = req.params.informacion;
-  const links = req.params.links;
-  const event = req.params.event;
-
-  try {
-    await client.query(
-      "INSERT INTO eventsnoticias (titulo, informacion, links, event) VALUES ($1, $2, $3, $4)",
-      [titulo, informacion, links, event]
-    );
-    const message = `L'event ${titulo} s'ha creat correctament`;
-    msg = await menu();
-    await res.status(201).json({ message });
-  } catch (error) {
-    console.error(error);
-    await res.status(500).json({ message: "Error al crear el event" });
-  }
 });
 
 app.post("/webhook", (req, res) => {
@@ -427,11 +283,7 @@ app.post("/webhook", (req, res) => {
               sender.send(errorMsg);
             }
           })();
-        } else if (
-          msg_body.split(".").length > 1 &&
-          msg_body.split(".")[0] != "" &&
-          msg_body.split(".")[1] != ""
-        ) {
+        } else if (msg_body.split(".").length > 1) {
           if (
             1 <= parseInt(msg_body.split(".")[0]) &&
             parseInt(msg_body.split(".")[0]) <= Object.keys(tables).length
