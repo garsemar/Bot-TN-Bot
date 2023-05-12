@@ -174,47 +174,7 @@ app.use(function (req, res, next) {
 
 app.get("/", (req, res) => {
   // res.sendFile('/app/index.html');
-  res.render("/app/index2.ejs", {
-    tables: tables,
-  });
-});
-app.get("/form", (req, res) => {
-  // res.sendFile('/app/index.html');
-  res.render("/app/form_add.ejs", {
-    tables: tables,
-  });
-});
-app.get("/events", (req, res) => {
-  // res.sendFile('/app/index.html');
-  res.render("/app/events.ejs", {
-    tables: tables,
-  });
-});
-app.get("/index2", (req, res) => {
-  // res.sendFile('/app/index.html');
-  res.render("/app/index.ejs", {
-    tables: tables,
-  });
-});
-app.get("/admin", (req, res) => {
-  // res.sendFile('/app/index.html');
-  res.render("/app/admin.ejs", {
-    tables: tables,
-  });
-});
-app.get("/info", (req, res) => {
-  // res.sendFile('/app/index.html');
-  res.render("/app/info.ejs", {
-    tables: tables,
-  });
-});
-app.get("/login", (req, res) => {
-  // res.sendFile('/app/index.html');
-  res.render("/app/login.ejs");
-});
-app.get("/file", (req, res) => {
-  // /something?color1=red
-  res.sendFile("/app/src/" + req.query.name);
+  res.status(405).json({error: "Method no allowed"})
 });
 
 app.get("/api/tableName", (req, res) => {
