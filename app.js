@@ -74,7 +74,6 @@ async function listNames(name, numList) {
 
 async function listInfo(id1, id, msg) {
   let msgInfo = "";
-  console.log(id);
   await client
     .query(
       "SELECT id, idCat, nom, informacion, contacto, horarios, web, direccion FROM (SELECT row_number() over() id, idCat, nom, informacion, contacto, horarios, web, direccion FROM items WHERE idCat = " +
@@ -140,7 +139,6 @@ class Sender {
       },
       headers: { "Content-Type": "application/json" },
     })
-      .then((response) => console.log("response"))
       .catch((error) => console.log(error));
   }
 }
@@ -179,7 +177,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/tableName", (req, res) => {
-  console.log(tables);
   res.json(tables);
 });
 
@@ -303,15 +300,41 @@ app.get("/api/events/:event", async (req, res) => {
     });
 });
 
-app.post("/api/events/:titulo&:informacion&:links&:event", async (req, res) => {
-  const titulo = req.params.titulo;
-  const informacion = req.params.informacion;
-  const links = req.params.links;
-  const event = req.params.event;
+app.put("/api/events", async (req, res) => {
+  const id = req.body.id;
+  const titulo = req.body.titulo;
+  const informacion = req.body.informacion;
+  const links = req.body.links;
+
+  await client
+    .query("update eventsnoticias set titulo = ($1), informacion = ($2), links = ($3) where id = ($4)", [titulo, informacion, links, id])
+    .then((response) => {
+      res.status(201).json(response.rows);
+    })
+    .catch((err) => {
+      client.end();
+    	res.status(500).json({ message: "Error al editar l'event" });
+    });
+});
+
+app.post("/api/events", async (req, res) => {
+  const titular = req.body.titular;
+  const informacion = req.body.informacion;
+  const url = req.body.url;
+  const category = req.body.category;
+  
+  let event
+  
+	if(category === 'Eventos'){
+    event = false
+  }
+  else{
+    event = true
+  }
 
   try {
-    await client.query("INSERT INTO eventnoticias (titulo, informacion, links, event) VALUES ($1, $2, $3, $4)", [titulo, informacion, links, event]);
-    const message = `L'event ${titulo} s'ha creat correctament`;
+    await client.query("INSERT INTO eventsnoticias (titulo, informacion, links, event) VALUES ($1, $2, $3, $4)", [titular, informacion, url, event]);
+    const message = `L'event ${titular} s'ha creat correctament`;
     msg = await menu();
     await res.status(201).json({ message });
   } catch (error) {
@@ -331,26 +354,6 @@ app.delete("/api/events/:id", async (req, res) => {
   await res.json({
     message: `L'event ` + id + `s'ha eliminat correctament`,
   });
-});
-
-app.post("/api/events/:tiulo/:informacion/:links/:event", async (req, res) => {
-  const titulo = req.params.titulo;
-  const informacion = req.params.informacion;
-  const links = req.params.links;
-  const event = req.params.event;
-
-  try {
-    await client.query(
-      "INSERT INTO eventsnoticias (titulo, informacion, links, event) VALUES ($1, $2, $3, $4)",
-      [titulo, informacion, links, event]
-    );
-    const message = `L'event ${titulo} s'ha creat correctament`;
-    msg = await menu();
-    await res.status(201).json({ message });
-  } catch (error) {
-    console.error(error);
-    await res.status(500).json({ message: "Error al crear el event" });
-  }
 });
 
 app.post("/webhook", (req, res) => {
